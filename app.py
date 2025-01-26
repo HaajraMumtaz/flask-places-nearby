@@ -3,10 +3,14 @@ import requests
 import re
 import time
 from decimal import Decimal
-
+from dotenv import load_dotenv
+import os
+import math
 app = Flask(__name__)
 
-import math
+load_dotenv()  # Load variables from .env
+api_key = os.getenv("API_KEY")
+
 
 def haversine_distance(lat1, lon1, lat2, lon2):
     # Radius of Earth in kilometers
@@ -44,24 +48,6 @@ def populatearr(data,places,api_key,pagecount):
         places.extend(data['results'])
     else:
         print(f"Error: {data.get('status')}")
-def sortarr(place,prefval,selected,arrix,preftype):
-    # print(f"rating:{rating}\n")
-    print(preftype)
-    selected.append(place)
-    # # if(arrix>0):
-    # #     if(preftype=="rating"):
-    # #         print("here")
-    # #         print("for this:", selected[arrix-1].get('rating',0),">",str(prefval))
-    # #         selected=sorted(selected, key=lambda x: x["rating"])
-
-                
-    # #     elif(preftype=="holrating"):
-    # #         selected.sort(key=lambda x: x['holrating'])
-    # arrix+=1
-    # print("arrix",arrix)
-    # return arrix
-api_key="AIzaSyAezb9x0qjZcBVrNv86APb7Yh9b6-M51V8"
-
 def tolocation(url):
     pattern = r"@([^,]+),([^,]+)"
     match = re.search(pattern, url)
@@ -114,21 +100,26 @@ def submit():
             sorting=request.form['sortby']
             print("sorting")
 
-            for place in places:
-                print(place['name'])
             arrix=0
-            if(sorting=="absolute_rating"):
+            if(sorting=="absolute_rating"): #if sorting is through rating
                 for place in places:
+                    latitude2 = place.get("geometry", {}).get("location", {}).get("lat",latitude)    
+                    longitude2= place.get("geometry", {}).get("location", {}).get("lng",longitude)
+                    try:
+                        latitude2 = Decimal(latitude2)
+                        longitude2 = Decimal(longitude2)
+                    except Exception as e:
+                        return("Invalid location data")
+                    place['distance']=haversine_distance(latitude,longitude,latitude2,longitude2)
                     rating=place.get('rating', '0')
                     place['holrating']=rating
                     selected.append(place)
                     arrix+=1
                 selected = sorted(selected, key=lambda x: x.get('rating',0),reverse=True)
-                    # arrix=sortarr(place,rating,selected,arrix,"rating")
-                # selected=sorted(selected,key=lambda x:x["rating"])
-            elif(sorting=="recommended"): 
+        
+            elif(sorting=="recommended"): #if sorting through holisic rating
                 priority=request.form["priority"]
-                if(priority=="distance"):
+                if(priority=="distance"):#setting up priority wise weights
                     distance_weight=6
                     rating_weight=4
                 elif(priority=="rating"):
@@ -149,10 +140,30 @@ def submit():
                     distance=haversine_distance(latitude,longitude,latitude2,longitude2)
                     holrating=(float(rating)/5*rating_weight)+(distance/10*distance_weight)
                     place['holrating']=round(float(holrating),2)
+                    place['distance']=haversine_distance(latitude,longitude,latitude2,longitude2)
                     selected.append(place)
                     arrix+=1
                     selected = sorted(selected, key=lambda x: x.get('holrating',0),reverse=True)
-            return render_template('results.html', places=selected)
+            else:
+                for place in places:
+                    latitude2 = place.get("geometry", {}).get("location", {}).get("lat",latitude)    
+                    longitude2= place.get("geometry", {}).get("location", {}).get("lng",longitude)
+                    try:
+                        latitude2 = Decimal(latitude2)
+                        longitude2 = Decimal(longitude2)
+                    except Exception as e:
+                        return("Invalid location data")
+                    distance=haversine_distance(latitude,longitude,latitude2,longitude2)
+                    place['holrating']=place.get('rating',0)
+                    place['distance']=haversine_distance(latitude,longitude,latitude2,longitude2)
+                    if (place['distance'])<=float(request.form['radius']):
+                        selected.append(place)
+          
+            Unique=[]
+            for place in selected:
+                if place['name'] not in Unique:
+                    Unique.append(place)       
+            return render_template('results.html', places=Unique)
         except Exception as e:
             return f"Error parsing API response: {e}"
     else:

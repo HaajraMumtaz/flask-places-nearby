@@ -1,64 +1,174 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>food-finder-app</title>
+    <title>Food Finder App</title>
+    <style>
+        /* General Styling */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-top: 30px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            font-weight: bold;
+            color: #34495e;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .form-control:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        select.form-control {
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+
+        .btn-primary {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: #3498db;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+
+        .mb-3 {
+            margin-bottom: 20px;
+        }
+
+        .form-section {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            font-size: 16px;
+            color: #34495e;
+        }
+
+        .form-control:disabled {
+            background-color: #f2f2f2;
+        }
+
+        .form-control:focus:disabled {
+            border-color: #ddd;
+        }
+
+        /* Media Query for Responsiveness */
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
 </head>
+
 <body>
-    <h1>Food-Finder</h1>
-    <br>
-    <br>
-    <form action="/submit" method="POST">
-        <div class="mb-3">
-            <label for="location" class="form-label">Google Location Url</label>
-            <input type="text" class="form-control" id="location" name="location" placeholder="https://www.google.com/maps..."
-                required style="width: 27ch;">
-            <br>
-            <label for="radius" class="form-label">Radius(km)</label>
-            <input type="number" class="form-control" id="radius" name="radius" min="0" max="10"
-                placeholder="e.g 8 (less than 10km)" required style="width: 22ch;">
-            <br>
-            <label for="typeloc">Choose food type:</label>
-            <select id="typeloc" name="typeloc" class="form-control" required>
-                <option value="restaurant" selected>General/All</option>
-                <option value="cafe">Coffee</option>
-                <option value="bakery">Bakery</option>
-                <option value="ice_cream_parlor">Ice-Cream</option>
-                <option value="juice_bar">Juice</option>
-                <option value="donut_shop">Donuts</option>
-            </select>
-            <label for="sortby">Sort By:</label>
-                <select id="sortby" name="sortby" onchange="toggleSecondDropdown()">
+    <h1>Food Finder</h1>
+    <div class="container">
+        <form action="/submit" method="POST">
+            <div class="mb-3">
+                <label for="location" class="form-label">Google Location URL</label>
+                <input type="text" class="form-control" id="location" name="location" placeholder="https://www.google.com/maps..."
+                    required>
+            </div>
+
+            <div class="mb-3">
+                <label for="radius" class="form-label">Radius (km)</label>
+                <input type="number" class="form-control" id="radius" name="radius" min="0" max="10"
+                    placeholder="e.g 8 (less than 10km)" required>
+            </div>
+
+            <div class="mb-3 form-section">
+                <label for="typeloc" class="form-label">Choose Food Type</label>
+                <select id="typeloc" name="typeloc" class="form-control" required>
+                    <option value="restaurant" selected>General/All</option>
+                    <option value="cafe">Coffee</option>
+                    <option value="bakery">Bakery</option>
+                    <option value="ice_cream_parlor">Ice-Cream</option>
+                    <option value="juice_bar">Juice</option>
+                    <option value="donut_shop">Donuts</option>
+                </select>
+            </div>
+
+            <div class="mb-3 form-section">
+                <label for="sortby" class="form-label">Sort By</label>
+                <select id="sortby" name="sortby" class="form-control" onchange="toggleSecondDropdown()">
                     <option value="distance">Distance</option>
                     <option value="absolute_rating">Absolute Rating</option>
                     <option value="recommended">Recommended</option>
                 </select>
+            </div>
 
-                <!-- Priority Options for Recommended -->
-                <label for="priority">Priority:</label>
-                <select id="priority" disabled name="priority" >
-                    <option value="distance">distance</option>
-                    <option value="rating">rating</option>
+            <!-- Priority Options for Recommended -->
+            <div class="mb-3 form-section">
+                <label for="priority" class="form-label">Priority</label>
+                <select id="priority" name="priority" class="form-control" disabled>
+                    <option value="distance">Distance</option>
+                    <option value="rating">Rating</option>
                 </select>
+            </div>
 
-                <script>
-                    function toggleSecondDropdown() {
-                        var firstDropdown = document.getElementById("sortby").value;
-                        var secondDropdown = document.getElementById("priority");
-            
-                        // Enable or disable the second dropdown based on the first dropdown's selection
-                        if (firstDropdown === "recommended") {
-                            secondDropdown.disabled = false;
-                        } else {
-                            secondDropdown.disabled = true;
-                        }
-                    }
-                </script>
-        <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="submit" class="btn-primary">Submit</button>
+        </form>
+    </div>
 
-        
-    </form>
-    
+    <script>
+        function toggleSecondDropdown() {
+            var firstDropdown = document.getElementById("sortby").value;
+            var secondDropdown = document.getElementById("priority");
+
+            // Enable or disable the second dropdown based on the first dropdown's selection
+            if (firstDropdown === "recommended") {
+                secondDropdown.disabled = false;
+            } else {
+                secondDropdown.disabled = true;
+            }
+        }
+    </script>
 </body>
+
 </html>
