@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>food-finder-app</title>
+</head>
+
+<body>
+    <h1>Food-Finder: Your results</h1>
+    <br>
+    <!-- <h1>Places Found.<br> Details:</h1>
+    <p>radius:{{radius}}</p>
+    <p>latitude:{{latitude}}</p>
+    <p>longitude:{{longitude}}</p>
+    <p>type:{{typeloc}}</p> -->
+    {% if places %}
+        <ul>
+            {% for place in places %}
+            <li>
+                <strong>{{ place['name']}}</strong><br>
+                <em>{{ place['vicinity']}}</em><br>
+                <em>{{ place['holrating']}}</em>
+                <hr>
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+    <p>No places found.</p>
+    {% endif %}
+    <br><br>
+    <a href="/">Go back to search</a>
+</body>
+
+</html>

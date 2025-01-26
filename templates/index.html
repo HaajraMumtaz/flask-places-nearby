@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>food-finder-app</title>
+</head>
+<body>
+    <h1>Food-Finder</h1>
+    <br>
+    <br>
+    <form action="/submit" method="POST">
+        <div class="mb-3">
+            <label for="location" class="form-label">Google Location Url</label>
+            <input type="text" class="form-control" id="location" name="location" placeholder="https://www.google.com/maps..."
+                required style="width: 27ch;">
+            <br>
+            <label for="radius" class="form-label">Radius(km)</label>
+            <input type="number" class="form-control" id="radius" name="radius" min="0" max="10"
+                placeholder="e.g 8 (less than 10km)" required style="width: 22ch;">
+            <br>
+            <label for="typeloc">Choose food type:</label>
+            <select id="typeloc" name="typeloc" class="form-control" required>
+                <option value="restaurant" selected>General/All</option>
+                <option value="cafe">Coffee</option>
+                <option value="bakery">Bakery</option>
+                <option value="ice_cream_parlor">Ice-Cream</option>
+                <option value="juice_bar">Juice</option>
+                <option value="donut_shop">Donuts</option>
+            </select>
+            <label for="sortby">Sort By:</label>
+                <select id="sortby" name="sortby" onchange="toggleSecondDropdown()">
+                    <option value="distance">Distance</option>
+                    <option value="absolute_rating">Absolute Rating</option>
+                    <option value="recommended">Recommended</option>
+                </select>
+
+                <!-- Priority Options for Recommended -->
+                <label for="priority">Priority:</label>
+                <select id="priority" disabled name="priority" >
+                    <option value="distance">distance</option>
+                    <option value="rating">rating</option>
+                </select>
+
+                <script>
+                    function toggleSecondDropdown() {
+                        var firstDropdown = document.getElementById("sortby").value;
+                        var secondDropdown = document.getElementById("priority");
+            
+                        // Enable or disable the second dropdown based on the first dropdown's selection
+                        if (firstDropdown === "recommended") {
+                            secondDropdown.disabled = false;
+                        } else {
+                            secondDropdown.disabled = true;
+                        }
+                    }
+                </script>
+        <button type="submit" class="btn btn-primary">Submit</button>
+
+        
+    </form>
+    
+</body>
+</html>
